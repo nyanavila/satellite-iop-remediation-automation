@@ -1,0 +1,38 @@
+--- 
+  - name: "Dispatch IOP Remediation via Satellite Remote Execution (REX)" 
+    hosts: localhost 
+    gather_facts: false 
+    vars_files: 
+      - ../vault/vault.yml 
+    
+    module\_defaults: 
+      group/redhat.satellite.satellite: 
+        username: "{{ satellite_username }}" 
+        password: "{{ satellite_password }}" 
+        server_url: "{{ satellite_url }}" 
+        validate_certs: "{{ validate_certs }}" 
+        
+    tasks: 
+      - name: Fetch IOP Playbook YAML via API 
+        ansible.builtin.uri: 
+          url: "{{ satellite_url }}/katello/api/v2/remediations/{{ iop_plan_id }}/playbook" 
+          method: GET 
+          user: "{{ satellite_username }}" 
+          password: "{{ satellite_password }}" 
+          force_basic_auth: true 
+          status_code: 200 
+          return_content: true 
+        register: iop_playbook 
+        
+      - name: Trigger Remote Execution Job in Satellite 
+        redhat.satellite.job_invocation: 
+          job_template: "Run Ansible Playbook" 
+          inputs: 
+            playbook: "{{ iop_playbook.content }}" 
+          search_query: "organization = '{{ satellite_organization }}' and status.installed = true" 
+          state: present 
+        register: rex_job_output 
+      
+      - name: Display Satellite REX Job Invocation ID 
+        ansible.builtin.debug: 
+          var: rex_job_output.job_invocation.id
