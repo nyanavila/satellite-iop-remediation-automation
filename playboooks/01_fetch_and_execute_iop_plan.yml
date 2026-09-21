@@ -1,0 +1,18 @@
+--- 
+  - name: "Phase 1: Fetch IOP Remediation Plan via API" 
+    hosts: localhost 
+    gather_facts: false 
+    vars_files: 
+      - ../vault/vault.yml 
+    roles: - iop_remediation_handler
+    
+  - name: "Phase 2: Execute IOP Remediation Playbook on Target Hosts" 
+    import_playbook: "/tmp/fetched_iop_remediation.yml" 
+    
+    - name: "Phase 3: Trigger Post-Remediation Insights Rescan" 
+      hosts: all 
+      gather_facts: false 
+      tasks: 
+        - name: Run insights-client to verify remediation compliance 
+          ansible.builtin.command: insights-client 
+          changed_when: false
