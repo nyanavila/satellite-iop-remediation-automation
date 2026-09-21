@@ -1,6 +1,0 @@
---- 
-satellite_url: "https://satellite.example.com" 
-satellite_username: "admin" 
-satellite_password: "YourEncryptedPassword" 
-satellite_organization: "Default Organization" 
-satellite_location: "Default Location"
