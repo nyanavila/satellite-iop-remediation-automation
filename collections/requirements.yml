@@ -1,7 +1,0 @@
---- 
-collections: 
-  - name: redhat.satellite 
-    version: ">=3.1.0" 
-    
-  - name: community.general 
-    version: "9.0.0"
